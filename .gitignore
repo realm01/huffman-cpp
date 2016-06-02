@@ -1,3 +1,4 @@
 *.o
 *.sw*
 compiling_error.txt
+*.out
