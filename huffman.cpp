@@ -2,6 +2,7 @@
 #include "huffman.h"
 
 #include <iostream>
+#include <iomanip>
 
 #ifndef NULL
 #define NULL 0
@@ -11,6 +12,7 @@ Node::Node(char* c, const unsigned int& freq) {
   character = c;
   this->freq = freq;
   parent = NULL;
+  mapping = "";
 }
 
 LL::LL(Node* item) {
@@ -26,40 +28,113 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
   first = NULL;
 
   for(unsigned int i = 0; i < size; i += 2) {
-    unsigned int sum = linkedlist->get(i)->tree->freq + linkedlist->get(i + 1)->tree->freq;
+    std::cout << "before get" << std::endl;
+    LL* ll_left = linkedlist->get(i);
+    LL* ll_right = linkedlist->get(i + 1);
+    std::cout << "after get: " << ll_left << " : " << ll_right << std::endl;
+
+    int freq_left = ll_left->tree->freq;
+    int freq_right = 0;
+    if(ll_right != NULL)
+      freq_right = ll_right->tree->freq;
+
+    Node* n_left = ll_left->tree;
+    Node* n_right = NULL;
+    if(ll_right != NULL)
+      n_right = ll_right->tree;
+
+    std::cout << "finished assiging" << std::endl;
+    std::cout << freq_left << std::endl;
+    std::cout << freq_right << std::endl;
+    std::cout << n_left << std::endl;
+    std::cout << n_right << std::endl;
+
     if(first == NULL) {
-      first = new Node(NULL, sum);
-      first->left = linkedlist->get(i)->tree;
-      first->right = linkedlist->get(i + 1)->tree;
+      std::cout << "first is NULL" << std::endl;
+      first = new Node(NULL, freq_left + freq_right);
+      first->left = n_left;
+      first->right = n_right;
     }else{
       Node* current_node = first;
       while(true) {
         if(current_node->parent == NULL) {
+          // assigning to left parent subtree
+          // this is always the current node
           current_node->parent = new Node(NULL, current_node->freq);
           current_node->parent->left = current_node;
+          current_node->parent->right = n_left;
+          current_node->parent->freq += freq_left;
+          // assigning to right parent subtree
+          // this is always a new node with the caracter and its freq
+          if(n_right == NULL)
+            break;
+          current_node->parent->parent = new Node(NULL, current_node->parent->freq);
+          current_node->parent->parent->left = current_node->parent;
+          current_node->parent->parent->right = n_right;
+          current_node->parent->parent->freq += freq_right;
+          break;
         }else{
-          // no right
-          if(current_node->parent->right == NULL && current_node->parent->left != NULL) {
-            current_node->parent->right = new Node(NULL, sum);
-            current_node->parent->freq += sum;
-            current_node->parent->right->parent = current_node->parent->right;
-            current_node->parent->right->left =  linkedlist->get(i)->tree;
-            current_node->parent->right->right = linkedlist->get(i + 1)->tree;
-            break;
-          // no left
-          }else if(current_node->parent->left == NULL && current_node->parent->left == NULL) {
-            current_node->parent->left = new Node(NULL, sum);
-            current_node->parent->freq += sum;
-            current_node->parent->left->parent = current_node->parent->left;
-            current_node->parent->left->left =  linkedlist->get(i)->tree;
-            current_node->parent->left->right = linkedlist->get(i + 1)->tree;
-            break;
-          }
+          current_node = current_node->parent;
         }
-        current_node = current_node->parent;
       }
     }
   }
+
+  std::cout << "finished building tree, adapting first" << std::endl;
+
+  std::cout << first << std::endl;
+
+  Node* curr_node = first;
+  while(true) {
+    if(curr_node->parent != NULL) {
+      curr_node = curr_node->parent;
+      std::cout << curr_node->freq << std::endl;
+    }else{
+      first = curr_node;
+      break;
+    }
+  }
+
+  std::cout << first << std::endl;
+}
+
+void BinaryTree::print(Node const * next, unsigned int intent) {
+  Node const * curr_node = next;
+  if(curr_node == NULL)
+    curr_node = first;
+
+  if(curr_node->left != NULL)
+    print(curr_node->left, ++intent);
+
+  if(curr_node->right != NULL)
+    print(curr_node->right, ++intent);
+
+  std::cout << std::setw(intent) << ' ';
+  std::cout << curr_node->freq << " : " << curr_node->mapping << std::endl;
+}
+
+void BinaryTree::generateMapping(Node* curr_node, std::string curr_map) {
+  if(curr_node == NULL)
+    curr_node = first;
+
+  // well then lol..
+  if(curr_node == NULL)
+    return void();
+
+  if(curr_node->left != NULL) {
+    curr_map += '0';
+    generateMapping(curr_node->left, curr_map);
+  }
+
+  if(curr_node->right != NULL) {
+    curr_map += '1';
+    generateMapping(curr_node->right, curr_map);
+  }
+
+  // left and right Nodes are NULL which means we are
+  // at a leaf Node, now assign the mapping to the it
+
+  curr_node->mapping = curr_map;
 }
 
 void LL::insert(Node* item) {
@@ -89,10 +164,14 @@ int* LL::getFreq(const char& c) {
 }
 
 LL* LL::get(const int& i, const int curr) {
-  if(i == curr)
+  if(i == curr) {
     return this;
-  else
-    return next->get(i, curr + 1);
+  }else{
+    if(next == NULL)
+      return NULL;
+    else
+      return next->get(i, curr + 1);
+  }
 }
 
 std::string* compress(std::string* input) {
@@ -153,4 +232,12 @@ std::string* compress(std::string* input) {
   std::cout << "======================================================== BINARY TREE" << std::endl;
 
   BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
+  std::cout << "---------" << std::endl;
+  bst->print();
+  std::cout << "---------" << std::endl;
+  for(unsigned int i = 0; i < ll_size; i++)
+    std::cout << linkedlist->get(i) << " : " << linkedlist->get(i)->tree << " : " <<  linkedlist->get(i)->tree->character << " : " <<  linkedlist->get(i)->tree->freq << std::endl;
+
+  bst->generateMapping();
+  bst->print();
 }
