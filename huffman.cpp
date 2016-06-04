@@ -131,13 +131,11 @@ void BinaryTree::generateMapping(Node* curr_node, std::string curr_map) {
     return void();
 
   if(curr_node->left != NULL) {
-    curr_map += '0';
-    generateMapping(curr_node->left, curr_map);
+    generateMapping(curr_node->left, curr_map + '0');
   }
 
   if(curr_node->right != NULL) {
-    curr_map += '1';
-    generateMapping(curr_node->right, curr_map);
+    generateMapping(curr_node->right, curr_map + '1');
   }
 
   // left and right Nodes are NULL which means we are
