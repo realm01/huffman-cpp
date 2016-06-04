@@ -259,12 +259,12 @@ std::string* compress(std::string* input) {
     std::string map = ll_n->tree->mapping;
     const char* c = ll_n->tree->character;
 
-    std::string::iterator j = input->begin();
-    while(j != input->end()) {
-      std::cout << *j << std::endl;
-      if(*c == *j)
-        encoded->replace(j, j, map);
-      j++;
+    while(true) {
+      size_t pos = encoded->find_first_of(*c);
+      if(pos == std::string::npos)
+        break;
+      else
+        encoded->replace(pos, 1, map);
     }
   }
 
