@@ -14,12 +14,14 @@ Node::Node(char* c, const unsigned int& freq) {
 }
 
 LL::LL(Node* item) {
+  next = NULL;
   if(item != NULL)
     tree = item;
   else
     tree = NULL;
 }
 
+// huffman tree implemented as a binary tree filled in bottom up
 BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
   first = NULL;
 
@@ -61,24 +63,32 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
 }
 
 void LL::insert(Node* item) {
-  if(next == NULL)
+  std::cout << "item: " << item->character << " next: " << next << std::endl;
+  if(tree == NULL && next == NULL) {
+    tree = item;
+  }else if(next == NULL) {
     next = new LL(item);
-  else
+    std::cout << "new next" << std::endl;
+  }else{
     next->insert(item);
+  }
 }
 
 int* LL::getFreq(const char& c) {
   if(tree == NULL)
     return 0;
 
-  if(*(tree->character) == c)
+  if(*(tree->character) == c) {
     return &(tree->freq);
-  else
-    return getFreq(c);
+  }else{
+    if(next == NULL)
+      return NULL;
+    else
+      return next->getFreq(c);
+  }
 }
 
 LL* LL::get(const int& i, const int curr) {
-  std::cout << *this << std::endl;
   if(i == curr)
     return this;
   else
@@ -91,23 +101,34 @@ std::string* compress(std::string* input) {
 
   std::string::iterator i = input->begin();
   while(i != input->end()) {
+    std::cout << "creating getfreq call" << std::endl;
     int* freq = linkedlist->getFreq(*i);
+    std::cout << "freq: " << freq << std::endl;
     if(freq == NULL) {
-      linkedlist->insert(new Node(&*i));
+      std::cout << "creating insert call" << std::endl;
+      linkedlist->insert(new Node(new char(*i)));
+      std::cout << "after insert call: " << linkedlist->tree << std::endl;
       ll_size++;
     }else{
-      *freq++;
+      std::cout << "for increasing: " << *i << " : " << *freq << std::endl;
+      (*freq)++;
+      std::cout << *freq << std::endl;
     }
     i++;
   }
 
   // sort linked list
   // I will use bubblesort, because we will have max 256
-  LL t0;
+  Node* t0;
 
   std::cout << "before sort: " << ll_size << std::endl;
 
-  for(int j = ll_size; j > 0; j--) {
+  for(unsigned int i = 0; i < ll_size; i++)
+    std::cout << linkedlist->get(i) << " : " << linkedlist->get(i)->tree << " : " <<  linkedlist->get(i)->tree->character << " : " <<  linkedlist->get(i)->tree->freq << std::endl;
+
+  std::cout << "======================================================== " << ll_size << std::endl;
+
+  for(int j = ll_size - 1; j > 0; j--) {
     for(int i = 0; i < j; i++) {
       std::cout << "before get" << std::endl;
       LL* ll_f = linkedlist->get(i);
@@ -119,12 +140,17 @@ std::string* compress(std::string* input) {
       std::cout << ll_s->tree << std::endl;
       if(ll_f->tree->freq > ll_s->tree->freq) {
         std::cout << "after if" << std::endl;
-        t0 = *(ll_f);
-        *(ll_f) = *(ll_s);
-        *(ll_s) = t0;
+        t0 = ll_f->tree;
+        ll_f->tree = ll_s->tree;
+        ll_s->tree = t0;
       }
     }
   }
 
-  // BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
+  for(unsigned int i = 0; i < ll_size; i++)
+    std::cout << linkedlist->get(i) << " : " << linkedlist->get(i)->tree << " : " <<  linkedlist->get(i)->tree->character << " : " <<  linkedlist->get(i)->tree->freq << std::endl;
+
+  std::cout << "======================================================== BINARY TREE" << std::endl;
+
+  BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
 }
