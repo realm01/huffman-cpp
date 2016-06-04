@@ -52,25 +52,24 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
     if(first == NULL) {
       std::cout << "first is NULL" << std::endl;
       first = new Node(NULL, freq_left + freq_right);
-      first->left = n_left;
-      first->right = n_right;
+      first->left = n_right;
+      first->right = n_left;
     }else{
       Node* current_node = first;
       while(true) {
         if(current_node->parent == NULL) {
-          // assigning to left parent subtree
-          // this is always the current node
           current_node->parent = new Node(NULL, current_node->freq);
-          current_node->parent->left = current_node;
-          current_node->parent->right = n_left;
+          current_node->parent->right = current_node;
+          current_node->parent->left = n_left;
           current_node->parent->freq += freq_left;
-          // assigning to right parent subtree
-          // this is always a new node with the caracter and its freq
+
           if(n_right == NULL)
             break;
+
+          std::cout << "CONT" << std::endl;
           current_node->parent->parent = new Node(NULL, current_node->parent->freq);
-          current_node->parent->parent->left = current_node->parent;
-          current_node->parent->parent->right = n_right;
+          current_node->parent->parent->right = current_node->parent;
+          current_node->parent->parent->left = n_right;
           current_node->parent->parent->freq += freq_right;
           break;
         }else{
@@ -96,6 +95,16 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
   }
 
   std::cout << first << std::endl;
+
+  std::cout << "BT intense debugging" << std::endl;
+  std::cout << first->freq << std::endl;
+  std::cout << first->left->freq << std::endl;
+  std::cout << first->right->freq << std::endl;
+  std::cout << first->right->left->freq << std::endl;
+  std::cout << first->right->right->freq << std::endl;
+  std::cout << first->right->right->left << std::endl;
+  std::cout << first->right->right->right << std::endl;
+
 }
 
 void BinaryTree::print(Node const * next, unsigned int intent) {
@@ -240,4 +249,24 @@ std::string* compress(std::string* input) {
 
   bst->generateMapping();
   bst->print();
+
+  std::string* encoded = new std::string(input->c_str());
+
+  std::cout << *encoded << std::endl;
+
+  for(unsigned int i = 0; i < ll_size; i++) {
+    LL* ll_n = linkedlist->get(i);
+    std::string map = ll_n->tree->mapping;
+    const char* c = ll_n->tree->character;
+
+    std::string::iterator j = input->begin();
+    while(j != input->end()) {
+      std::cout << *j << std::endl;
+      if(*c == *j)
+        encoded->replace(j, j, map);
+      j++;
+    }
+  }
+
+  return encoded;
 }

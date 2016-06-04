@@ -7,7 +7,7 @@ using namespace std;
 int main() {
   string* input = new string("aaabbc");
 
-  compress(input);
+  cout << *(compress(input)) << endl;
 
   return 0;
 }
