@@ -16,6 +16,12 @@ Node::Node(char* c, const unsigned int& freq) {
   mapping = "";
 }
 
+Node::~Node(void) {
+  delete(character);
+  delete(left);
+  delete(right);
+}
+
 LL::LL(Node* item) {
   next = NULL;
   if(item != NULL)
@@ -24,15 +30,17 @@ LL::LL(Node* item) {
     tree = NULL;
 }
 
+LL::~LL(void) {
+  delete(next);
+}
+
 // huffman tree implemented as a binary tree filled in bottom up
 BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
   first = NULL;
 
   for(unsigned int i = 0; i < size; i += 2) {
-    std::cout << "before get" << std::endl;
     LL* ll_left = linkedlist->get(i);
     LL* ll_right = linkedlist->get(i + 1);
-    std::cout << "after get: " << ll_left << " : " << ll_right << std::endl;
 
     int freq_left = ll_left->tree->freq;
     int freq_right = 0;
@@ -44,14 +52,7 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
     if(ll_right != NULL)
       n_right = ll_right->tree;
 
-    std::cout << "finished assiging" << std::endl;
-    std::cout << freq_left << std::endl;
-    std::cout << freq_right << std::endl;
-    std::cout << n_left << std::endl;
-    std::cout << n_right << std::endl;
-
     if(first == NULL) {
-      std::cout << "first is NULL" << std::endl;
       first = new Node(NULL, freq_left + freq_right);
       first->left = n_right;
       first->right = n_left;
@@ -67,7 +68,6 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
           if(n_right == NULL)
             break;
 
-          std::cout << "CONT" << std::endl;
           current_node->parent->parent = new Node(NULL, current_node->parent->freq);
           current_node->parent->parent->right = current_node->parent;
           current_node->parent->parent->left = n_right;
@@ -80,32 +80,19 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
     }
   }
 
-  std::cout << "finished building tree, adapting first" << std::endl;
-
-  std::cout << first << std::endl;
-
   Node* curr_node = first;
   while(true) {
     if(curr_node->parent != NULL) {
       curr_node = curr_node->parent;
-      std::cout << curr_node->freq << std::endl;
     }else{
       first = curr_node;
       break;
     }
   }
+}
 
-  std::cout << first << std::endl;
-
-  std::cout << "BT intense debugging" << std::endl;
-  std::cout << first->freq << std::endl;
-  std::cout << first->left->freq << std::endl;
-  std::cout << first->right->freq << std::endl;
-  std::cout << first->right->left->freq << std::endl;
-  std::cout << first->right->right->freq << std::endl;
-  std::cout << first->right->right->left << std::endl;
-  std::cout << first->right->right->right << std::endl;
-
+BinaryTree::~BinaryTree(void) {
+  delete(first);
 }
 
 void BinaryTree::print(Node const * next, unsigned int intent) {
@@ -146,15 +133,12 @@ void BinaryTree::generateMapping(Node* curr_node, std::string curr_map) {
 }
 
 void LL::insert(Node* item) {
-  std::cout << "item: " << item->character << " next: " << next << std::endl;
-  if(tree == NULL && next == NULL) {
+  if(tree == NULL && next == NULL)
     tree = item;
-  }else if(next == NULL) {
+  else if(next == NULL)
     next = new LL(item);
-    std::cout << "new next" << std::endl;
-  }else{
+  else
     next->insert(item);
-  }
 }
 
 int* LL::getFreq(const char& c) {
@@ -189,18 +173,12 @@ std::string* Huffman::compress(std::string* input) {
 
   std::string::iterator i = input->begin();
   while(i != input->end()) {
-    std::cout << "creating getfreq call" << std::endl;
     int* freq = linkedlist->getFreq(*i);
-    std::cout << "freq: " << freq << std::endl;
     if(freq == NULL) {
-      std::cout << "creating insert call" << std::endl;
       linkedlist->insert(new Node(new char(*i)));
-      std::cout << "after insert call: " << linkedlist->tree << std::endl;
       ll_size++;
     }else{
-      std::cout << "for increasing: " << *i << " : " << *freq << std::endl;
       (*freq)++;
-      std::cout << *freq << std::endl;
     }
     i++;
   }
@@ -209,25 +187,11 @@ std::string* Huffman::compress(std::string* input) {
   // I will use bubblesort, because we will have max 256
   Node* t0;
 
-  std::cout << "before sort: " << ll_size << std::endl;
-
-  for(unsigned int i = 0; i < ll_size; i++)
-    std::cout << linkedlist->get(i) << " : " << linkedlist->get(i)->tree << " : " <<  linkedlist->get(i)->tree->character << " : " <<  linkedlist->get(i)->tree->freq << std::endl;
-
-  std::cout << "======================================================== " << ll_size << std::endl;
-
   for(int j = ll_size - 1; j > 0; j--) {
     for(int i = 0; i < j; i++) {
-      std::cout << "before get" << std::endl;
       LL* ll_f = linkedlist->get(i);
-      std::cout << "after get : " << i  << std::endl;
       LL* ll_s = linkedlist->get(i+1);
-      std::cout << "after get" << std::endl;
-      std::cout << linkedlist << std::endl;
-      std::cout << ll_f->tree << std::endl;
-      std::cout << ll_s->tree << std::endl;
       if(ll_f->tree->freq > ll_s->tree->freq) {
-        std::cout << "after if" << std::endl;
         t0 = ll_f->tree;
         ll_f->tree = ll_s->tree;
         ll_s->tree = t0;
@@ -235,24 +199,10 @@ std::string* Huffman::compress(std::string* input) {
     }
   }
 
-  for(unsigned int i = 0; i < ll_size; i++)
-    std::cout << linkedlist->get(i) << " : " << linkedlist->get(i)->tree << " : " <<  linkedlist->get(i)->tree->character << " : " <<  linkedlist->get(i)->tree->freq << std::endl;
-
-  std::cout << "======================================================== BINARY TREE" << std::endl;
-
   BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
-  std::cout << "---------" << std::endl;
-  bst->print();
-  std::cout << "---------" << std::endl;
-  for(unsigned int i = 0; i < ll_size; i++)
-    std::cout << linkedlist->get(i) << " : " << linkedlist->get(i)->tree << " : " <<  linkedlist->get(i)->tree->character << " : " <<  linkedlist->get(i)->tree->freq << std::endl;
-
   bst->generateMapping();
-  bst->print();
 
   std::string* encoded = new std::string(input->c_str());
-
-  std::cout << *encoded << std::endl;
 
   for(unsigned int i = 0; i < ll_size; i++) {
     LL* ll_n = linkedlist->get(i);
@@ -273,11 +223,28 @@ std::string* Huffman::compress(std::string* input) {
   for(unsigned int i = 0; i < ll_size; i++) {
     this->encoding = new Huffman::Encoding();
     this->encoding->data = new std::vector<std::string>();
-    this->encoding->data->push_back(*(new std::string(new char(*(linkedlist->get(i)->tree->character)))));
+    const char* tmp = new char(*(linkedlist->get(i)->tree->character));
+    this->encoding->data->push_back(std::string(tmp));
+    delete(tmp);
     this->encoding->data->push_back(linkedlist->get(i)->tree->mapping);
   }
 
+  delete(linkedlist);
+  delete(bst);
+
   return encoded;
+}
+
+Huffman::~Huffman(void) {
+  if(encoded != NULL)
+    delete(encoded);
+  if(encoding != NULL)
+    delete(encoding);
+}
+
+Huffman::Encoding::~Encoding(void) {
+  if(data != NULL)
+    delete(data);
 }
 
 std::string* Huffman::decompress(const std::string* input) {

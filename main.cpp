@@ -9,8 +9,12 @@ int main() {
   Huffman* hm = new Huffman();
   hm->compress(input);
 
+  cout << *input << endl;
   cout << *(hm->getEncoded()) << endl;
   // cout << *(decompressed) << endl;
+
+  delete(input);
+  delete(hm);
 
   return 0;
 }
