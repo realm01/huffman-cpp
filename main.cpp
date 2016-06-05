@@ -5,9 +5,12 @@
 using namespace std;
 
 int main() {
-  string* input = new string("aaabbc");
+  string* input = new string("this is just a test");
+  Huffman* hm = new Huffman();
+  hm->compress(input);
 
-  cout << *(compress(input)) << endl;
+  cout << *(hm->getEncoded()) << endl;
+  // cout << *(decompressed) << endl;
 
   return 0;
 }

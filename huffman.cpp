@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include "huffman.h"
 
 #include <iostream>
@@ -181,7 +182,8 @@ LL* LL::get(const int& i, const int curr) {
   }
 }
 
-std::string* compress(std::string* input) {
+std::string* Huffman::compress(std::string* input) {
+  this->original = *input;
   LL* linkedlist = new LL();
   unsigned int ll_size = 0;
 
@@ -266,5 +268,35 @@ std::string* compress(std::string* input) {
     }
   }
 
+  this->encoded = encoded;
+
+  for(unsigned int i = 0; i < ll_size; i++) {
+    this->encoding = new Huffman::Encoding();
+    this->encoding->data = new std::vector<std::string>();
+    this->encoding->data->push_back(*(new std::string(new char(*(linkedlist->get(i)->tree->character)))));
+    this->encoding->data->push_back(linkedlist->get(i)->tree->mapping);
+  }
+
+  return encoded;
+}
+
+std::string* Huffman::decompress(const std::string* input) {
+
+}
+
+void Huffman::setEncoding(const std::vector<std::string>* encoding) {
+  // this->encoding = new Huffman::Encoding();
+  // this->encoding->data = encoding;
+}
+
+std::vector<std::string>* getEncoding(void) {
+
+}
+
+void Huffman::parseEncoding(const std::string str_enc) {
+
+}
+
+std::string* Huffman::getEncoded(void) {
   return encoded;
 }

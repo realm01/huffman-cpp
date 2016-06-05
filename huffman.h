@@ -2,6 +2,7 @@
 #define __HUFFMAN_H
 
 #include <string>
+#include <vector>
 
 struct Node {
   Node* left;
@@ -31,6 +32,21 @@ class BinaryTree {
     void generateMapping(Node* curr_node = NULL, std::string curr_map = "");
 };
 
-std::string* compress(std::string* input);
+class Huffman {
+  private:
+    std::string original;
+    std::string* encoded;
+    struct Encoding {
+      std::vector<std::string>* data;
+    };
+    Encoding* encoding;
+  public:
+    std::string* compress(std::string* input);
+    std::string* decompress(const std::string* input);
+    void setEncoding(const std::vector<std::string>* encoding);
+    std::vector<std::string>* getEncoding(void);
+    void parseEncoding(const std::string str_enc);
+    std::string* getEncoded(void);
+};
 
 #endif
