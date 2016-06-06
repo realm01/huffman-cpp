@@ -11,7 +11,7 @@ int main() {
 
   cout << *input << endl;
   cout << *(hm->getEncoded()) << endl;
-  // cout << *(decompressed) << endl;
+  cout << *(hm->decompress(hm->getEncoded())) << endl;
 
   delete(input);
   delete(hm);

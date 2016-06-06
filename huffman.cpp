@@ -202,7 +202,7 @@ std::string* Huffman::compress(std::string* input) {
   BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
   bst->generateMapping();
 
-  std::string* encoded = new std::string(input->c_str());
+  encoded = new std::string(input->c_str());
 
   for(unsigned int i = 0; i < ll_size; i++) {
     LL* ll_n = linkedlist->get(i);
@@ -219,10 +219,10 @@ std::string* Huffman::compress(std::string* input) {
   }
 
   this->encoded = encoded;
+  this->encoding = new Huffman::Encoding();
+  this->encoding->data = new std::vector<std::string>();
 
-  for(unsigned int i = 0; i < ll_size; i++) {
-    this->encoding = new Huffman::Encoding();
-    this->encoding->data = new std::vector<std::string>();
+  for(int i = ll_size - 1; i >= 0 ; i--) {
     const char* tmp = new char(*(linkedlist->get(i)->tree->character));
     this->encoding->data->push_back(std::string(tmp));
     delete(tmp);
@@ -248,7 +248,25 @@ Huffman::Encoding::~Encoding(void) {
 }
 
 std::string* Huffman::decompress(const std::string* input) {
+  if(encoding == NULL || encoding->data == NULL)
+    throw "no encoding set";
 
+  encoded = new std::string(input->c_str());
+
+  std::vector<std::string>::iterator i = encoding->data->end() - 1;
+  while(i > encoding->data->begin()) {
+    while(true) {
+      const char tmp[] = {*((*(i - 1)).c_str()), '\0'};
+      size_t pos = encoded->find_last_of(*i);
+      if(pos == std::string::npos)
+        break;
+      else
+        encoded->replace(pos, 1, tmp);
+    }
+    i -= 2;
+  }
+
+  return encoded;
 }
 
 void Huffman::setEncoding(const std::vector<std::string>* encoding) {
