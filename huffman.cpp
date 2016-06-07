@@ -210,7 +210,7 @@ std::string* Huffman::compress(std::string* input) {
     const char* c = ll_n->tree->character;
 
     while(true) {
-      size_t pos = encoded->find_first_of(*c);
+      size_t pos = encoded->find(*c);
       if(pos == std::string::npos)
         break;
       else
@@ -257,11 +257,11 @@ std::string* Huffman::decompress(const std::string* input) {
   while(i > encoding->data->begin()) {
     while(true) {
       const char tmp[] = {*((*(i - 1)).c_str()), '\0'};
-      size_t pos = encoded->find_last_of(*i);
+      size_t pos = encoded->find(*i);
       if(pos == std::string::npos)
         break;
       else
-        encoded->replace(pos, 1, tmp);
+        encoded->replace(pos, (*i).size(), tmp);
     }
     i -= 2;
   }
