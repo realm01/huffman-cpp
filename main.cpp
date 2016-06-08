@@ -7,7 +7,7 @@
 using namespace std;
 
 void showHelp(void) {
-  cout << "Huffman Encoder and Decoder\nCopyright (c) Anastassios Martakos\n\nUSAGE\n-e <input-file> <output-file>       # encode\n-e <input-file> <output-file>       # decode\n" << endl;
+  cout << "Huffman Encoder and Decoder\nCopyright (c) Anastassios Martakos\n\nUSAGE\n-e <input-file> <output-file>       # encode\n-d <input-file> <output-file>       # decode\n" << endl;
 }
 
 int main(int argc, char *argv[]) {
