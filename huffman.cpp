@@ -1,5 +1,7 @@
 #include <string>
 #include <vector>
+#include <sstream>
+#include <stdlib.h>
 #include "huffman.h"
 
 #include <iostream>
@@ -226,7 +228,9 @@ std::string* Huffman::compress(std::string* input) {
     const char* tmp = new char(*(linkedlist->get(i)->tree->character));
     this->encoding->data->push_back(std::string(tmp));
     delete(tmp);
-    this->encoding->data->push_back(linkedlist->get(i)->tree->mapping);
+    std::ostringstream oss;
+    oss << linkedlist->get(i)->tree->freq;
+    this->encoding->data->push_back(oss.str());
   }
 
   delete(linkedlist);
@@ -252,19 +256,28 @@ std::string* Huffman::decompress(const std::string* input) {
     throw "no encoding set";
 
   encoded = new std::string(input->c_str());
+  LL* linkedlist = new LL();
+  unsigned int ll_size = 0;
 
   std::vector<std::string>::iterator i = encoding->data->end() - 1;
   while(i > encoding->data->begin()) {
-    while(true) {
+    linkedlist->insert(new Node(new char(*((*i).c_str())), atoi((*i).c_str())));
+    ll_size++;
+    /* while(true) {
       const char tmp[] = {*((*(i - 1)).c_str()), '\0'};
       size_t pos = encoded->find(*i);
       if(pos == std::string::npos)
         break;
       else
         encoded->replace(pos, (*i).size(), tmp);
-    }
+    }*/
     i -= 2;
   }
+
+  BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
+
+  delete(linkedlist);
+  delete(bst);
 
   return encoded;
 }
