@@ -52,7 +52,7 @@ class Huffman {
     std::string* decompress(const std::string* input);
     void setEncoding(std::vector<std::string>* encoding);
     std::vector<std::string>* getEncoding(void);
-    void parseEncoding(const std::string str_enc);
+    std::vector<std::string>* parseEncoding(const std::string& str_enc);
     std::string* getEncoded(void);
     void writeToFile(const std::string& file);
 };

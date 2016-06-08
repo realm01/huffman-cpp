@@ -314,8 +314,38 @@ std::vector<std::string>* Huffman::getEncoding(void) {
   return encoding->data;
 }
 
-void Huffman::parseEncoding(const std::string str_enc) {
+std::vector<std::string>* Huffman::parseEncoding(const std::string& str_enc) {
+  std::string::const_iterator i = str_enc.begin();
+  std::vector<std::string>* final = new std::vector<std::string>();
 
+  std::string* tmp = new std::string();
+  bool state = false;
+
+  while(i != str_enc.end()) {
+    if(!state) {
+      const char* t = new char(*i);
+      char tt[] = {*t, '\0'};
+      final->insert(final->begin(), std::string(tt));
+      delete(t);
+      state = true;
+    }else{
+      if(*i != ';') {
+        *tmp += *i;
+      }else{
+        final->insert(final->begin() + 1,std::string(*tmp));
+        delete(tmp);
+        tmp = new std::string();
+        state = false;
+      }
+    }
+
+    i++;
+  }
+
+  if(tmp != NULL)
+    delete(tmp);
+
+  return final;
 }
 
 std::string* Huffman::getEncoded(void) {
