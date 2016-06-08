@@ -5,6 +5,7 @@
 #include "huffman.h"
 
 #include <iostream>
+#include <fstream>
 #include <iomanip>
 
 #ifndef NULL
@@ -304,13 +305,13 @@ std::string* Huffman::decompress(const std::string* input) {
   return encoded;
 }
 
-void Huffman::setEncoding(const std::vector<std::string>* encoding) {
-  // this->encoding = new Huffman::Encoding();
-  // this->encoding->data = encoding;
+void Huffman::setEncoding(std::vector<std::string>* encoding) {
+  this->encoding = new Huffman::Encoding();
+  this->encoding->data = encoding;
 }
 
-std::vector<std::string>* getEncoding(void) {
-
+std::vector<std::string>* Huffman::getEncoding(void) {
+  return encoding->data;
 }
 
 void Huffman::parseEncoding(const std::string str_enc) {
@@ -319,4 +320,37 @@ void Huffman::parseEncoding(const std::string str_enc) {
 
 std::string* Huffman::getEncoded(void) {
   return encoded;
+}
+
+std::string* Huffman::generateHeader(void) {
+  if(encoding == NULL)
+    return NULL;
+
+  std::string* final = new std::string();
+
+  std::vector<std::string>::iterator i = encoding->data->end() - 1;
+  while(i > encoding->data->begin()) {
+    const char tmp[] = {*((*(i - 1)).c_str()), '\0'};
+    *final += std::string(tmp);
+    *final += *i;
+    *final += ';';
+    i -= 2;
+  }
+
+  return final;
+}
+
+void Huffman::writeToFile(const std::string& file) {
+  std::string* header = generateHeader();
+
+  std::ofstream outfile;
+  outfile.open(file.c_str(), std::ios::out);
+
+  outfile << *header << std::endl;
+  outfile << *encoded << std::endl;
+
+  outfile.close();
+
+  if(header != NULL)
+    delete(header);
 }

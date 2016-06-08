@@ -11,7 +11,9 @@ int main() {
 
   cout << *input << endl;
   cout << *(hm->getEncoded()) << endl;
+  hm->writeToFile("/ashscr1/testfile");
   cout << *(hm->decompress(hm->getEncoded())) << endl;
+
 
   delete(input);
   delete(hm);

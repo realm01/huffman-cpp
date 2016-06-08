@@ -45,14 +45,16 @@ class Huffman {
       ~Encoding(void);
     };
     Encoding* encoding;
+    std::string* generateHeader(void);
   public:
     ~Huffman(void);
     std::string* compress(std::string* input);
     std::string* decompress(const std::string* input);
-    void setEncoding(const std::vector<std::string>* encoding);
+    void setEncoding(std::vector<std::string>* encoding);
     std::vector<std::string>* getEncoding(void);
     void parseEncoding(const std::string str_enc);
     std::string* getEncoded(void);
+    void writeToFile(const std::string& file);
 };
 
 #endif
