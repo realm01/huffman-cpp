@@ -33,6 +33,7 @@ class BinaryTree {
     ~BinaryTree(void);
     void print(Node const * next = NULL, unsigned int intent = 0);
     void generateMapping(Node* curr_node = NULL, std::string curr_map = "");
+    Node* getFirst(void);
 };
 
 class Huffman {

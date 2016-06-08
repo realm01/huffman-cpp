@@ -12,6 +12,8 @@
 #endif
 
 Node::Node(char* c, const unsigned int& freq) {
+  right = NULL;
+  left = NULL;
   character = c;
   this->freq = freq;
   parent = NULL;
@@ -19,9 +21,12 @@ Node::Node(char* c, const unsigned int& freq) {
 }
 
 Node::~Node(void) {
-  delete(character);
-  delete(left);
-  delete(right);
+  if(character != NULL)
+    delete(character);
+  if(left != NULL)
+    delete(left);
+  if(right != NULL)
+    delete(right);
 }
 
 LL::LL(Node* item) {
@@ -33,7 +38,8 @@ LL::LL(Node* item) {
 }
 
 LL::~LL(void) {
-  delete(next);
+  if(next != NULL)
+    delete(next);
 }
 
 // huffman tree implemented as a binary tree filled in bottom up
@@ -94,7 +100,8 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
 }
 
 BinaryTree::~BinaryTree(void) {
-  delete(first);
+  if(first != NULL)
+    delete(first);
 }
 
 void BinaryTree::print(Node const * next, unsigned int intent) {
@@ -132,6 +139,10 @@ void BinaryTree::generateMapping(Node* curr_node, std::string curr_map) {
   // at a leaf Node, now assign the mapping to the it
 
   curr_node->mapping = curr_map;
+}
+
+Node* BinaryTree::getFirst(void) {
+  return first;
 }
 
 void LL::insert(Node* item) {
@@ -186,7 +197,7 @@ std::string* Huffman::compress(std::string* input) {
   }
 
   // sort linked list
-  // I will use bubblesort, because we will have max 256
+  // I will use bubblesort, because we will have not so many
   Node* t0;
 
   for(int j = ll_size - 1; j > 0; j--) {
@@ -255,26 +266,37 @@ std::string* Huffman::decompress(const std::string* input) {
   if(encoding == NULL || encoding->data == NULL)
     throw "no encoding set";
 
-  encoded = new std::string(input->c_str());
+  encoded = new std::string();
   LL* linkedlist = new LL();
   unsigned int ll_size = 0;
 
   std::vector<std::string>::iterator i = encoding->data->end() - 1;
   while(i > encoding->data->begin()) {
-    linkedlist->insert(new Node(new char(*((*i).c_str())), atoi((*i).c_str())));
+    linkedlist->insert(new Node(new char(*((*(i - 1)).c_str())), atoi((*i).c_str())));
     ll_size++;
-    /* while(true) {
-      const char tmp[] = {*((*(i - 1)).c_str()), '\0'};
-      size_t pos = encoded->find(*i);
-      if(pos == std::string::npos)
-        break;
-      else
-        encoded->replace(pos, (*i).size(), tmp);
-    }*/
     i -= 2;
   }
 
   BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
+
+  Node* curr_node = bst->getFirst();
+
+  std::string::const_iterator curr_symbol = input->begin();
+  while(curr_symbol != input->end()) {
+    if(*curr_symbol == '0') {
+      if(curr_node->left != NULL)
+        curr_node = curr_node->left;
+    }else if(*curr_symbol == '1') {
+      if(curr_node->right != NULL)
+        curr_node = curr_node->right;
+    }
+    if(curr_node->left == NULL && curr_node->right == NULL) {
+      const char tmp[] = {*(curr_node->character), '\0'};
+      *encoded += std::string(tmp);
+      curr_node = bst->getFirst();
+    }
+    curr_symbol++;
+  }
 
   delete(linkedlist);
   delete(bst);
