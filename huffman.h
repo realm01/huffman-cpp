@@ -54,7 +54,7 @@ class Huffman {
     std::vector<std::string>* getEncoding(void);
     std::vector<std::string>* parseEncoding(const std::string& str_enc);
     std::string* getEncoded(void);
-    void writeToFile(const std::string& file);
+    void writeToFile(const std::string& file, const bool write_header = true);
 };
 
 #endif

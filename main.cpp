@@ -1,36 +1,59 @@
 #include <iostream>
 #include <string>
+#include <sstream>
+#include <fstream>
 #include "huffman.h"
 
 using namespace std;
 
-int main() {
-  string* input = new string("this is just a test");
+void showHelp(void) {
+  cout << "Huffman Encoder and Decoder\nCopyright (c) Anastassios Martakos\n\nUSAGE\n-e <input-file> <output-file>       # encode\n-e <input-file> <output-file>       # decode\n" << endl;
+}
+
+int main(int argc, char *argv[]) {
+  if(argc < 4) {
+    showHelp();
+    return 1;
+  }
+
+  string* input = new string();
   Huffman* hm = new Huffman();
-  hm->compress(input);
 
-  cout << *input << endl;
-  cout << *(hm->getEncoded()) << endl;
-  hm->writeToFile("/ashscr1/testfile");
-  cout << *(hm->decompress(hm->getEncoded())) << endl;
+  if(string(argv[1]) == string("-e")) {
+    ifstream file;
+    file.open(argv[2]);
 
-  delete(input);
-  delete(hm);
+    stringstream buffer;
+    buffer << file.rdbuf();
+    *input = buffer.str();
 
+    input->erase(input->end() - 1, input->end());
 
-  string* enc = new string("h1;j1;u1;a1;e1;i2;t4;s4; 4;");
-  string* in = new string("110111111111110100111010011111110111111010110011111001101111010110");
+    cout << *input;
 
-  Huffman* hf = new Huffman();
+    hm->compress(input);
+    hm->writeToFile(string(argv[3]));
+  }else if(string(argv[1]) == string("-d")) {
+    ifstream file;
+    file.open(argv[2]);
 
-  hf->setEncoding(hf->parseEncoding(*enc));
-  cout << *(hf->decompress(in)) << endl;
+    string header;
+    getline(file, header);
 
-  delete(enc);
-  delete(in);
+    while(!file.eof()) {
+      file >> *input;
+    }
+
+    file.close();
+
+    hm->setEncoding(hm->parseEncoding(header));
+    hm->decompress(input);
+
+    hm->writeToFile(string(argv[3]), false);
+  }else{
+    showHelp();
+    return 1;
+  }
 
   return 0;
 }
-
-// nice explanation
-// http://www.cprogramming.com/tutorial/computersciencetheory/huffman.html

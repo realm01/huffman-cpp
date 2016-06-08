@@ -370,13 +370,14 @@ std::string* Huffman::generateHeader(void) {
   return final;
 }
 
-void Huffman::writeToFile(const std::string& file) {
+void Huffman::writeToFile(const std::string& file, const bool write_header) {
   std::string* header = generateHeader();
 
   std::ofstream outfile;
   outfile.open(file.c_str(), std::ios::out);
 
-  outfile << *header << std::endl;
+  if(write_header)
+    outfile << *header << std::endl;
   outfile << *encoded << std::endl;
 
   outfile.close();
