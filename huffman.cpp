@@ -54,6 +54,8 @@ LL::LL(Node* item) {
 LL::~LL(void) {
   if(next != NULL)
     delete(next);
+
+  next = NULL;
 }
 
 // huffman tree implemented as a binary tree filled in bottom up
