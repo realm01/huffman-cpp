@@ -12,6 +12,7 @@ $ huffman -e <input-file> <output-file>       # encode
 
 Compile
 -------
+Note that I am using c++11 because of the new awesome `std::string` and `std::unordered_map` classes!
 ```sh
-$ g++ -O3 -Wall main.cpp huffman.cpp -o huffman
+$ g++ -std=c++11 -O3 -Wall main.cpp huffman.cpp -o huffman
 ```

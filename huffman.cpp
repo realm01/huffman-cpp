@@ -15,8 +15,6 @@
 
 #include <string>
 #include <vector>
-#include <sstream>
-#include <stdlib.h>
 #include "huffman.h"
 
 #include <iostream>
@@ -256,9 +254,7 @@ std::string* Huffman::compress(std::string* input) {
     const char* tmp = new char(*(linkedlist->get(i)->tree->character));
     this->encoding->data->push_back(std::string(tmp));
     delete(tmp);
-    std::ostringstream oss;
-    oss << linkedlist->get(i)->tree->freq;
-    this->encoding->data->push_back(oss.str());
+    this->encoding->data->push_back(std::to_string(linkedlist->get(i)->tree->freq));
   }
 
   delete(linkedlist);
@@ -289,7 +285,7 @@ std::string* Huffman::decompress(const std::string* input) {
 
   std::vector<std::string>::iterator i = encoding->data->end() - 1;
   while(i > encoding->data->begin()) {
-    linkedlist->insert(new Node(new char(*((*(i - 1)).c_str())), atoi((*i).c_str())));
+    linkedlist->insert(new Node(new char(*((*(i - 1)).c_str())), std::stoi(*i)));
     ll_size++;
     i -= 2;
   }
