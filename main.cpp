@@ -29,8 +29,6 @@ int main(int argc, char *argv[]) {
 
     input->erase(input->end() - 1, input->end());
 
-    cout << *input;
-
     hm->compress(input);
     hm->writeToFile(string(argv[3]));
   }else if(string(argv[1]) == string("-d")) {
