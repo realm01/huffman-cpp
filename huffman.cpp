@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <unordered_map>
 
+#include <math.h>
+
 #ifndef NULL
 #define NULL 0
 #endif
@@ -386,15 +388,63 @@ std::string* Huffman::generateHeader(void) {
 
 void Huffman::writeToFile(const std::string& file, const bool write_header) {
   std::string* header = generateHeader();
+  const char* header_c = header->c_str();
 
-  std::ofstream outfile;
+  std::fstream outfile;
+  outfile.open(file.c_str(), std::ios::out | std::ios::binary);
+
+  unsigned int alloc_bytes = ceil(encoded->size() / 8);
+  unsigned char* bin = new unsigned char[alloc_bytes];
+
+  std::cout << "size: " << encoded->size() << std::endl;
+  std::cout << "allocating: " << alloc_bytes << " bytes" << std::endl;
+  const char* c_string = encoded->c_str();
+
+  for(unsigned int i = 0; i < alloc_bytes; i++) {
+    int conv[8];
+
+    for(unsigned int j = 0; j < 8; j++) {
+      if((i * 8) + j < encoded->size()) {
+        if(c_string[(i * 8) + j] == '1')
+          conv[j] = 1;
+        else
+          conv[j] = 0;
+      }else{
+        conv[j] = 1;
+      }
+    }
+
+    bin[i] =  conv[7] << 7 |
+              conv[6] << 6 |
+              conv[5] << 5 |
+              conv[4] << 4 |
+              conv[3] << 3 |
+              conv[2] << 2 |
+              conv[1] << 1 |
+              conv[0] << 0;
+  }
+
+  for(unsigned int m = 0; m < header->size(); m++) {
+    outfile << header_c[m];
+  }
+
+  for(unsigned int n = 0; n < alloc_bytes; n++) {
+    outfile << bin[n];
+  }
+
+  outfile.close();
+
+  /* std::ofstream outfile;
   outfile.open(file.c_str(), std::ios::out);
 
   if(write_header)
     outfile << *header << std::endl;
   outfile << *encoded << std::endl;
 
-  outfile.close();
+  outfile.close(); */
+
+  if(bin != NULL)
+    delete bin;
 
   if(header != NULL)
     delete(header);
