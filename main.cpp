@@ -57,6 +57,19 @@ int main(int argc, char *argv[]) {
       file >> *input;
     }
 
+    /* stringstream buffer;
+    buffer << file.rdbuf();
+    *input = buffer.str();
+
+    string::iterator iter = input->begin();
+    while(iter != input->end()) {
+      header += *iter;
+      cout << "iter" << endl;
+      if(*(iter + 2) != ';' || *(iter + 1) != ';')
+        break;
+      iter++;
+    } */
+
     file.close();
 
     hm->setEncoding(hm->parseEncoding(header));
