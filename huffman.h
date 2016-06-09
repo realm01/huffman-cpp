@@ -18,6 +18,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 struct Node {
   Node* left;
@@ -25,7 +26,6 @@ struct Node {
   Node* parent;
   const char* character;
   int freq;
-  std::string mapping;
   Node(char* c = NULL, const unsigned int& freq = 1);
   ~Node(void);
 };
@@ -47,7 +47,7 @@ class BinaryTree {
     BinaryTree(LL* linkedlist, const unsigned int& size);
     ~BinaryTree(void);
     void print(Node const * next = NULL, unsigned int intent = 0);
-    void generateMapping(Node* curr_node = NULL, std::string curr_map = "");
+    void generateMapping(std::unordered_map<std::string, std::string>* map, Node* curr_node = NULL, std::string curr_map = "");
     Node* getFirst(void);
 };
 

@@ -22,6 +22,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <unordered_map>
 
 #ifndef NULL
 #define NULL 0
@@ -33,7 +34,6 @@ Node::Node(char* c, const unsigned int& freq) {
   character = c;
   this->freq = freq;
   parent = NULL;
-  mapping = "";
 }
 
 Node::~Node(void) {
@@ -132,10 +132,12 @@ void BinaryTree::print(Node const * next, unsigned int intent) {
     print(curr_node->right, ++intent);
 
   std::cout << std::setw(intent) << ' ';
-  std::cout << curr_node->freq << " : " << curr_node->mapping << std::endl;
 }
 
-void BinaryTree::generateMapping(Node* curr_node, std::string curr_map) {
+void BinaryTree::generateMapping(std::unordered_map<std::string, std::string>* map, Node* curr_node, std::string curr_map) {
+  if(map == NULL)
+    map = new std::unordered_map<std::string, std::string>();
+
   if(curr_node == NULL)
     curr_node = first;
 
@@ -144,17 +146,20 @@ void BinaryTree::generateMapping(Node* curr_node, std::string curr_map) {
     return void();
 
   if(curr_node->left != NULL) {
-    generateMapping(curr_node->left, curr_map + '0');
+    generateMapping(map, curr_node->left, curr_map + '0');
   }
 
   if(curr_node->right != NULL) {
-    generateMapping(curr_node->right, curr_map + '1');
+    generateMapping(map, curr_node->right, curr_map + '1');
   }
 
   // left and right Nodes are NULL which means we are
   // at a leaf Node, now assign the mapping to the it
 
-  curr_node->mapping = curr_map;
+  if(curr_node->character != NULL) {
+    const char tmp[] = {*(curr_node->character), '\0'};
+    map->emplace(std::string(tmp), curr_map);
+  }
 }
 
 Node* BinaryTree::getFirst(void) {
@@ -229,23 +234,19 @@ std::string* Huffman::compress(std::string* input) {
   }
 
   BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
-  bst->generateMapping();
+  std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
+  bst->generateMapping(map);
 
-  encoded = new std::string(input->c_str());
+  encoded = new std::string();
 
-  for(unsigned int i = 0; i < ll_size; i++) {
-    LL* ll_n = linkedlist->get(i);
-    std::string map = ll_n->tree->mapping;
-    const char* c = ll_n->tree->character;
-
-    while(true) {
-      size_t pos = encoded->find(*c);
-      if(pos == std::string::npos)
-        break;
-      else
-        encoded->replace(pos, 1, map);
-    }
+  std::string::iterator curr_symbol = input->begin();
+  while(curr_symbol != input->end()) {
+    const char tmp[] = {*curr_symbol, '\0'};
+    encoded->append(map->at(std::string(tmp)));
+    curr_symbol++;
   }
+
+  delete(map);
 
   this->encoded = encoded;
   this->encoding = new Huffman::Encoding();
