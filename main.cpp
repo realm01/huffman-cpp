@@ -81,5 +81,8 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  delete hm;
+  delete input;
+
   return 0;
 }
