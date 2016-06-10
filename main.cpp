@@ -47,7 +47,16 @@ int main(int argc, char *argv[]) {
     hm->compress(input);
     hm->writeToFile(string(argv[3]));
   }else if(string(argv[1]) == string("-d")) {
-    ifstream file;
+    string header;
+
+    Huffman::prepareCompressed(header, input, argv[2]);
+
+    hm->setEncoding(hm->parseEncoding(header));
+    hm->decompress(input);
+
+    hm->writeToStringFile(argv[3]);
+
+    /* ifstream file;
     file.open(argv[2]);
 
     string header;
@@ -55,7 +64,7 @@ int main(int argc, char *argv[]) {
 
     while(!file.eof()) {
       file >> *input;
-    }
+    } */
 
     /* stringstream buffer;
     buffer << file.rdbuf();
@@ -70,12 +79,12 @@ int main(int argc, char *argv[]) {
       iter++;
     } */
 
-    file.close();
+    /* file.close();
 
     hm->setEncoding(hm->parseEncoding(header));
     hm->decompress(input);
 
-    hm->writeToFile(string(argv[3]), false);
+    hm->writeToFile(string(argv[3]), false); */
   }else{
     showHelp();
     return 1;

@@ -308,8 +308,10 @@ std::string* Huffman::decompress(const std::string* input) {
         curr_node = curr_node->right;
     }
     if(curr_node->left == NULL && curr_node->right == NULL) {
-      const char tmp[] = {*(curr_node->character), '\0'};
-      *encoded += std::string(tmp);
+      if(curr_node->character != NULL) {
+        const char tmp[] = {*(curr_node->character), '\0'};
+        *encoded += std::string(tmp);
+      }
       curr_node = bst->getFirst();
     }
     curr_symbol++;
@@ -335,25 +337,22 @@ std::vector<std::string>* Huffman::parseEncoding(const std::string& str_enc) {
   std::vector<std::string>* final = new std::vector<std::string>();
 
   std::string* tmp = new std::string();
-  bool state = false;
 
   while(i != str_enc.end()) {
-    if(!state) {
-      const char* t = new char(*i);
-      char tt[] = {*t, '\0'};
-      final->insert(final->begin(), std::string(tt));
-      delete(t);
-      state = true;
-    }else{
-      if(*i != ';') {
-        *tmp += *i;
-      }else{
-        final->insert(final->begin() + 1,std::string(*tmp));
-        delete(tmp);
-        tmp = new std::string();
-        state = false;
-      }
+    char tt[] = {*i, '\0'};
+    final->insert(final->begin(), std::string(tt));
+
+    i++;
+    while(true) {
+      if(*i == ';')
+        break;
+      char ttt[] = {*i, '\0'};
+      *tmp += std::string(ttt);
+      i++;
     }
+
+    final->insert(final->begin() + 1, *tmp);
+    tmp = new std::string();
 
     i++;
   }
@@ -393,7 +392,7 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
   std::fstream outfile;
   outfile.open(file.c_str(), std::ios::out | std::ios::binary);
 
-  unsigned int alloc_bytes = ceil(encoded->size() / 8);
+  unsigned int alloc_bytes = ceil(encoded->size() / 8) + 1;
   unsigned char* bin = new unsigned char[alloc_bytes];
 
   std::cout << "size: " << encoded->size() << std::endl;
@@ -448,4 +447,60 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
 
   if(header != NULL)
     delete(header);
+}
+
+void Huffman::writeToStringFile(const char* file) {
+  std::fstream outfile;
+  outfile.open(file, std::ios::out);
+
+  std::string::iterator i = encoded->begin();
+  while(i != encoded->end()) {
+    outfile << *i;
+    i++;
+  }
+
+  outfile.close();
+}
+
+void Huffman::prepareCompressed(std::string& header, std::string* input, const char* file) {
+  std::ifstream infile;
+  infile.open(file, std::ios::in | std::ios::binary | std::ios::ate);
+
+  long size = infile.tellg();
+  infile.seekg(0, std::ios::beg);
+  char* buff = new char[size];
+  infile.read(buff, size);
+  infile.close();
+
+  unsigned int counter = 0;
+  while(true) {
+    if(buff[counter] == ';') {
+      if(buff[counter + 2] != '0' &&
+        buff[counter + 2] != '1' &&
+        buff[counter + 2] != '2' &&
+        buff[counter + 2] != '3' &&
+        buff[counter + 2] != '4' &&
+        buff[counter + 2] != '5' &&
+        buff[counter + 2] != '6' &&
+        buff[counter + 2] != '7' &&
+        buff[counter + 2] != '8' &&
+        buff[counter + 2] != '9')
+        break;
+    }
+
+    const char tmp[] = {buff[counter], '\0'};
+    header += std::string(tmp);
+    counter++;
+  }
+
+  for(int i = counter; i < size - counter; i++) {
+    for(int j = 0; j < 8; j++) {
+      const char tmp[] = {((buff[i] & (1 << j)) ? '1' : '0'), '\0'};
+      *input += std::string(tmp);
+    }
+  }
+
+  header += ";";
+
+  infile.close();
 }
