@@ -46,7 +46,7 @@ class BinaryTree {
   public:
     BinaryTree(LL* linkedlist, const unsigned int& size);
     ~BinaryTree(void);
-    void print(Node const * next = NULL, unsigned int intent = 0);
+    void print(Node const * next = NULL, unsigned int intent = 0, std::string curr_map = "");
     void generateMapping(std::unordered_map<std::string, std::string>* map, Node* curr_node = NULL, std::string curr_map = "");
     Node* getFirst(void);
 };

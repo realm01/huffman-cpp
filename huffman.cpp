@@ -124,18 +124,21 @@ BinaryTree::~BinaryTree(void) {
     delete first;
 }
 
-void BinaryTree::print(Node const * next, unsigned int intent) {
+void BinaryTree::print(Node const * next, unsigned int intent, std::string curr_map) {
   Node const * curr_node = next;
   if(curr_node == NULL)
     curr_node = first;
 
   if(curr_node->left != NULL)
-    print(curr_node->left, ++intent);
+    print(curr_node->left, ++intent, curr_map + '0');
 
   if(curr_node->right != NULL)
-    print(curr_node->right, ++intent);
+    print(curr_node->right, ++intent, curr_map + '1');
 
-  std::cout << std::setw(intent) << ' ';
+  if(curr_node->character != NULL) {
+    const char tmp[] = { *(curr_node->character), '\0' };
+    std::cout << std::setw(intent) << ' ' << tmp << " : " << curr_map << std::endl;
+  }
 }
 
 void BinaryTree::generateMapping(std::unordered_map<std::string, std::string>* map, Node* curr_node, std::string curr_map) {
