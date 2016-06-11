@@ -40,11 +40,11 @@ Node::Node(char* c, const unsigned int& freq) {
 
 Node::~Node(void) {
   if(character != NULL)
-    delete(character);
+    delete character;
   if(left != NULL)
-    delete(left);
+    delete left;
   if(right != NULL)
-    delete(right);
+    delete right;
 }
 
 LL::LL(Node* item) {
@@ -57,7 +57,7 @@ LL::LL(Node* item) {
 
 LL::~LL(void) {
   if(next != NULL)
-    delete(next);
+    delete next;
 
   next = NULL;
 }
@@ -121,7 +121,7 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
 
 BinaryTree::~BinaryTree(void) {
   if(first != NULL)
-    delete(first);
+    delete first;
 }
 
 void BinaryTree::print(Node const * next, unsigned int intent) {
@@ -250,7 +250,7 @@ std::string* Huffman::compress(std::string* input) {
     curr_symbol++;
   }
 
-  delete(map);
+  delete map;
 
   this->encoded = encoded;
   this->encoding = new Huffman::Encoding();
@@ -259,26 +259,26 @@ std::string* Huffman::compress(std::string* input) {
   for(int i = ll_size - 1; i >= 0 ; i--) {
     const char* tmp = new char(*(linkedlist->get(i)->tree->character));
     this->encoding->data->push_back(std::string(tmp));
-    delete(tmp);
+    delete tmp;
     this->encoding->data->push_back(std::to_string(linkedlist->get(i)->tree->freq));
   }
 
-  delete(linkedlist);
-  delete(bst);
+  delete linkedlist;
+  delete bst;
 
   return encoded;
 }
 
 Huffman::~Huffman(void) {
   if(encoded != NULL)
-    delete(encoded);
+    delete encoded;
   if(encoding != NULL)
-    delete(encoding);
+    delete encoding;
 }
 
 Huffman::Encoding::~Encoding(void) {
   if(data != NULL)
-    delete(data);
+    delete data;
 }
 
 std::string* Huffman::decompress(const std::string* input) {
@@ -319,8 +319,8 @@ std::string* Huffman::decompress(const std::string* input) {
     curr_symbol++;
   }
 
-  delete(linkedlist);
-  delete(bst);
+  delete linkedlist;
+  delete bst;
 
   return encoded;
 }
@@ -359,8 +359,7 @@ std::vector<std::string>* Huffman::parseEncoding(const std::string& str_enc) {
     i++;
   }
 
-  if(tmp != NULL)
-    delete(tmp);
+  delete tmp;
 
   return final;
 }
@@ -397,8 +396,9 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
   unsigned int alloc_bytes = ceil(encoded->size() / 8) + 1;
   unsigned char* bin = new unsigned char[alloc_bytes];
 
-  std::cout << "size: " << encoded->size() << std::endl;
-  std::cout << "allocating: " << alloc_bytes << " bytes" << std::endl;
+  // std::cout << "size: " << encoded->size() << std::endl;
+  // std::cout << "allocating: " << alloc_bytes << " bytes" << std::endl;
+
   const char* c_string = encoded->c_str();
 
   unsigned int overflow = 0;
@@ -438,20 +438,11 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
 
   outfile.close();
 
-  /* std::ofstream outfile;
-  outfile.open(file.c_str(), std::ios::out);
-
-  if(write_header)
-    outfile << *header << std::endl;
-  outfile << *encoded << std::endl;
-
-  outfile.close(); */
-
   if(bin != NULL)
     delete bin;
 
   if(header != NULL)
-    delete(header);
+    delete header;
 }
 
 void Huffman::writeToStringFile(const char* file) {
@@ -514,6 +505,8 @@ void Huffman::prepareCompressed(std::string& header, std::string* input, unsigne
   }
 
   header += ";";
+
+  delete buff;
 
   infile.close();
 }
