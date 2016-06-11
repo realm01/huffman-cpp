@@ -496,7 +496,8 @@ void Huffman::prepareCompressed(std::string& header, std::string* input, unsigne
         buff[counter + 2] != '6' &&
         buff[counter + 2] != '7' &&
         buff[counter + 2] != '8' &&
-        buff[counter + 2] != '9')
+        buff[counter + 2] != '9' &&
+        buff[counter + 2] != ';')
         break;
     }
 

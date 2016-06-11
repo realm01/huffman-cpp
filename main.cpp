@@ -60,36 +60,6 @@ int main(int argc, char *argv[]) {
     hm->decompress(input);
 
     hm->writeToStringFile(argv[3]);
-
-    /* ifstream file;
-    file.open(argv[2]);
-
-    string header;
-    getline(file, header);
-
-    while(!file.eof()) {
-      file >> *input;
-    } */
-
-    /* stringstream buffer;
-    buffer << file.rdbuf();
-    *input = buffer.str();
-
-    string::iterator iter = input->begin();
-    while(iter != input->end()) {
-      header += *iter;
-      cout << "iter" << endl;
-      if(*(iter + 2) != ';' || *(iter + 1) != ';')
-        break;
-      iter++;
-    } */
-
-    /* file.close();
-
-    hm->setEncoding(hm->parseEncoding(header));
-    hm->decompress(input);
-
-    hm->writeToFile(string(argv[3]), false); */
   }else{
     showHelp();
     return 1;
