@@ -55,6 +55,7 @@ class Huffman {
   private:
     std::string original;
     std::string* encoded;
+    unsigned int overflow;
     struct Encoding {
       std::vector<std::string>* data;
       ~Encoding(void);
@@ -70,8 +71,9 @@ class Huffman {
     std::vector<std::string>* parseEncoding(const std::string& str_enc);
     std::string* getEncoded(void);
     void writeToFile(const std::string& file, const bool write_header = true);
-    static void prepareCompressed(std::string& header, std::string* input, const char* file);
+    static void prepareCompressed(std::string& header, std::string* input, unsigned int& overflow, const char* file);
     void writeToStringFile(const char* file);
+    void setOverflow(unsigned int& overflow);
 };
 
 #endif

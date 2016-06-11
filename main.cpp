@@ -36,11 +36,14 @@ int main(int argc, char *argv[]) {
 
   if(string(argv[1]) == string("-e")) {
     ifstream file;
-    file.open(argv[2]);
+    file.open(argv[2], ios::in);
 
     stringstream buffer;
     buffer << file.rdbuf();
     *input = buffer.str();
+
+    if(input->size() == 0)
+      return 0;
 
     input->erase(input->end() - 1, input->end());
 
@@ -48,9 +51,11 @@ int main(int argc, char *argv[]) {
     hm->writeToFile(string(argv[3]));
   }else if(string(argv[1]) == string("-d")) {
     string header;
+    unsigned int overflow;
 
-    Huffman::prepareCompressed(header, input, argv[2]);
+    Huffman::prepareCompressed(header, input, overflow, argv[2]);
 
+    hm->setOverflow(overflow);
     hm->setEncoding(hm->parseEncoding(header));
     hm->decompress(input);
 

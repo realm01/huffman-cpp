@@ -22,6 +22,8 @@
 #include <iomanip>
 #include <unordered_map>
 
+#include <stdlib.h>
+
 #include <math.h>
 
 #ifndef NULL
@@ -299,7 +301,7 @@ std::string* Huffman::decompress(const std::string* input) {
   Node* curr_node = bst->getFirst();
 
   std::string::const_iterator curr_symbol = input->begin();
-  while(curr_symbol != input->end()) {
+  while(curr_symbol < input->end() - overflow) {
     if(*curr_symbol == '0') {
       if(curr_node->left != NULL)
         curr_node = curr_node->left;
@@ -399,6 +401,8 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
   std::cout << "allocating: " << alloc_bytes << " bytes" << std::endl;
   const char* c_string = encoded->c_str();
 
+  unsigned int overflow = 0;
+
   for(unsigned int i = 0; i < alloc_bytes; i++) {
     int conv[8];
 
@@ -410,6 +414,7 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
           conv[j] = 0;
       }else{
         conv[j] = 1;
+        overflow++;
       }
     }
 
@@ -423,13 +428,13 @@ void Huffman::writeToFile(const std::string& file, const bool write_header) {
               conv[0] << 0;
   }
 
-  for(unsigned int m = 0; m < header->size(); m++) {
-    outfile << header_c[m];
-  }
+  outfile << overflow;
 
-  for(unsigned int n = 0; n < alloc_bytes; n++) {
+  for(unsigned int m = 0; m < header->size(); m++)
+    outfile << header_c[m];
+
+  for(unsigned int n = 0; n < alloc_bytes; n++)
     outfile << bin[n];
-  }
 
   outfile.close();
 
@@ -462,7 +467,11 @@ void Huffman::writeToStringFile(const char* file) {
   outfile.close();
 }
 
-void Huffman::prepareCompressed(std::string& header, std::string* input, const char* file) {
+void Huffman::setOverflow(unsigned int& overflow) {
+  this->overflow = overflow;
+}
+
+void Huffman::prepareCompressed(std::string& header, std::string* input, unsigned int& overflow, const char* file) {
   std::ifstream infile;
   infile.open(file, std::ios::in | std::ios::binary | std::ios::ate);
 
@@ -472,7 +481,10 @@ void Huffman::prepareCompressed(std::string& header, std::string* input, const c
   infile.read(buff, size);
   infile.close();
 
-  unsigned int counter = 0;
+  const char tmp[] = {buff[0], '\0'};
+  overflow = atoi(tmp);
+
+  unsigned int counter = 1;
   while(true) {
     if(buff[counter] == ';') {
       if(buff[counter + 2] != '0' &&
@@ -493,7 +505,7 @@ void Huffman::prepareCompressed(std::string& header, std::string* input, const c
     counter++;
   }
 
-  for(int i = counter; i < size - counter; i++) {
+  for(int i = ++counter; i < size; i++) {
     for(int j = 0; j < 8; j++) {
       const char tmp[] = {((buff[i] & (1 << j)) ? '1' : '0'), '\0'};
       *input += std::string(tmp);
