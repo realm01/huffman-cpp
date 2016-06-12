@@ -66,7 +66,59 @@ LL::~LL(void) {
 BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
   first = NULL;
 
-  for(unsigned int i = 0; i < size; i += 2) {
+  std::vector<Node* > tmp_ll;
+
+  for(unsigned int i = 0; i < size; i++)
+    tmp_ll.push_back(linkedlist->get(i)->tree);
+
+  std::cout << "here: " << tmp_ll.size() << std::endl;
+
+  while(true) {
+    Node* tmp = new Node();
+    tmp->freq = tmp_ll[0]->freq + tmp_ll[1]->freq;
+    tmp->left = tmp_ll[0];
+    tmp->right = tmp_ll[1];
+    tmp_ll[0]->parent = tmp;
+    tmp_ll[1]->parent = tmp;
+    tmp_ll.erase(tmp_ll.begin(), tmp_ll.begin() + 2);
+    std::cout << "SIZE E: " << tmp_ll.size() << "||";
+    std::cout << tmp->left << " : " << tmp->right << std::endl;
+    std::vector<Node* >::iterator i = tmp_ll.begin();
+    std::cout << tmp->left << " : " << tmp->right << " : " << tmp->left->parent << " : " << tmp->right->parent << std::endl;
+    std::cout << ">>>>>" << tmp << std::endl;
+    while(i != tmp_ll.end()) {
+      if((*i)->freq == tmp->freq || (*i)->freq > tmp->freq) {
+        tmp_ll.insert(i, tmp);
+        break;
+      }
+      i++;
+    }
+    std::cout << ">>>>>" << *i << std::endl;
+    std::cout << "SIZE: " << tmp_ll.size() << "||";
+    if(tmp_ll.size() == 1)
+      break;
+  }
+
+  std::cout << "finished" << std::endl;
+  std::cout << "SIZE: " << tmp_ll.size() << std::endl;
+
+  first = tmp_ll[0];
+  std::cout << first->left << " : " << first->right << " : " << first->parent << std::endl;
+
+  /* Node* curr_node = first;
+  while(true) {
+    if(curr_node->parent != NULL) {
+      curr_node = curr_node->parent;
+    }else{
+      std::cout << "hey" << std::endl;
+      first = curr_node;
+      break;
+    }
+  } */
+
+  std::cout << "LOL: " << first << std::endl;
+
+  /* for(unsigned int i = 0; i < size; i += 2) {
     LL* ll_left = linkedlist->get(i);
     LL* ll_right = linkedlist->get(i + 1);
 
@@ -116,7 +168,7 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
       first = curr_node;
       break;
     }
-  }
+  } */
 }
 
 BinaryTree::~BinaryTree(void) {
@@ -148,6 +200,10 @@ void BinaryTree::generateMapping(std::unordered_map<std::string, std::string>* m
   if(curr_node == NULL)
     curr_node = first;
 
+  std::cout << "doin some stuff" << std::endl;
+  std::cout << first->left << " : " << first->right << std::endl;
+  std::cout << curr_node->left << " : " << curr_node->right << std::endl;
+
   // well then lol..
   if(curr_node == NULL)
     return void();
@@ -165,6 +221,7 @@ void BinaryTree::generateMapping(std::unordered_map<std::string, std::string>* m
 
   if(curr_node->character != NULL) {
     const char tmp[] = {*(curr_node->character), '\0'};
+    std::cout << ">>>>>>>>>>>:" << tmp << std::endl;
     map->emplace(std::string(tmp), curr_map);
   }
 }
@@ -244,16 +301,25 @@ std::string* Huffman::compress(std::string* input) {
   std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
   bst->generateMapping(map);
 
+  std::cout << "hhere" << std::endl;
+
   encoded = new std::string();
 
   std::string::iterator curr_symbol = input->begin();
+  std::cout << "HUI" << std::endl;
   while(curr_symbol != input->end()) {
     const char tmp[] = {*curr_symbol, '\0'};
+    std::cout << "JK: " << tmp << std::endl;
     encoded->append(map->at(std::string(tmp)));
+    std::cout << "JK 1" << std::endl;
     curr_symbol++;
   }
 
+  std::cout << "hhere 2" << std::endl;
+
   delete map;
+
+  std::cout << "hhere 3" << std::endl;
 
   this->encoded = encoded;
   this->encoding = new Huffman::Encoding();
@@ -265,6 +331,8 @@ std::string* Huffman::compress(std::string* input) {
     delete tmp;
     this->encoding->data->push_back(std::to_string(linkedlist->get(i)->tree->freq));
   }
+
+  std::cout << "gofferdeckel" << std::endl;
 
   delete linkedlist;
   delete bst;
