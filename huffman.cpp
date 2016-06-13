@@ -71,8 +71,6 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
   for(unsigned int i = 0; i < size; i++)
     tmp_ll.push_back(linkedlist->get(i)->tree);
 
-  std::cout << "here: " << tmp_ll.size() << std::endl;
-
   while(true) {
     Node* tmp = new Node();
     tmp->freq = tmp_ll[0]->freq + tmp_ll[1]->freq;
@@ -81,94 +79,23 @@ BinaryTree::BinaryTree(LL* linkedlist, const unsigned int& size) {
     tmp_ll[0]->parent = tmp;
     tmp_ll[1]->parent = tmp;
     tmp_ll.erase(tmp_ll.begin(), tmp_ll.begin() + 2);
-    std::cout << "SIZE E: " << tmp_ll.size() << "||";
-    std::cout << tmp->left << " : " << tmp->right << std::endl;
     std::vector<Node* >::iterator i = tmp_ll.begin();
-    std::cout << tmp->left << " : " << tmp->right << " : " << tmp->left->parent << " : " << tmp->right->parent << std::endl;
-    std::cout << ">>>>>" << tmp << std::endl;
+    if(tmp_ll.size() == 0) {
+      tmp_ll.push_back(tmp);
+      break;
+    }
     while(i != tmp_ll.end()) {
-      if((*i)->freq == tmp->freq || (*i)->freq > tmp->freq) {
+      if((*i)->freq == tmp->freq || (*i)->freq > tmp->freq || i == tmp_ll.end() - 1) {
         tmp_ll.insert(i, tmp);
         break;
       }
       i++;
     }
-    std::cout << ">>>>>" << *i << std::endl;
-    std::cout << "SIZE: " << tmp_ll.size() << "||";
     if(tmp_ll.size() == 1)
       break;
   }
 
-  std::cout << "finished" << std::endl;
-  std::cout << "SIZE: " << tmp_ll.size() << std::endl;
-
   first = tmp_ll[0];
-  std::cout << first->left << " : " << first->right << " : " << first->parent << std::endl;
-
-  /* Node* curr_node = first;
-  while(true) {
-    if(curr_node->parent != NULL) {
-      curr_node = curr_node->parent;
-    }else{
-      std::cout << "hey" << std::endl;
-      first = curr_node;
-      break;
-    }
-  } */
-
-  std::cout << "LOL: " << first << std::endl;
-
-  /* for(unsigned int i = 0; i < size; i += 2) {
-    LL* ll_left = linkedlist->get(i);
-    LL* ll_right = linkedlist->get(i + 1);
-
-    int freq_left = ll_left->tree->freq;
-    int freq_right = 0;
-    if(ll_right != NULL)
-      freq_right = ll_right->tree->freq;
-
-    Node* n_left = ll_left->tree;
-    Node* n_right = NULL;
-    if(ll_right != NULL)
-      n_right = ll_right->tree;
-
-    if(first == NULL) {
-      first = new Node(NULL, freq_left + freq_right);
-      first->left = n_right;
-      first->right = n_left;
-    }else{
-      Node* current_node = first;
-      while(true) {
-        if(current_node->parent == NULL) {
-          current_node->parent = new Node(NULL, current_node->freq);
-          current_node->parent->right = current_node;
-          current_node->parent->left = n_left;
-          current_node->parent->freq += freq_left;
-
-          if(n_right == NULL)
-            break;
-
-          current_node->parent->parent = new Node(NULL, current_node->parent->freq);
-          current_node->parent->parent->right = current_node->parent;
-          current_node->parent->parent->left = n_right;
-          current_node->parent->parent->freq += freq_right;
-          break;
-        }else{
-          current_node = current_node->parent;
-        }
-      }
-    }
-  }
-
-  Node* curr_node = first;
-  while(true) {
-    if(curr_node->parent != NULL) {
-      curr_node = curr_node->parent;
-    }else{
-      first = curr_node;
-      break;
-    }
-  } */
 }
 
 BinaryTree::~BinaryTree(void) {
@@ -200,10 +127,6 @@ void BinaryTree::generateMapping(std::unordered_map<std::string, std::string>* m
   if(curr_node == NULL)
     curr_node = first;
 
-  std::cout << "doin some stuff" << std::endl;
-  std::cout << first->left << " : " << first->right << std::endl;
-  std::cout << curr_node->left << " : " << curr_node->right << std::endl;
-
   // well then lol..
   if(curr_node == NULL)
     return void();
@@ -221,7 +144,6 @@ void BinaryTree::generateMapping(std::unordered_map<std::string, std::string>* m
 
   if(curr_node->character != NULL) {
     const char tmp[] = {*(curr_node->character), '\0'};
-    std::cout << ">>>>>>>>>>>:" << tmp << std::endl;
     map->emplace(std::string(tmp), curr_map);
   }
 }
@@ -301,25 +223,16 @@ std::string* Huffman::compress(std::string* input) {
   std::unordered_map<std::string, std::string>* map = new std::unordered_map<std::string, std::string>();
   bst->generateMapping(map);
 
-  std::cout << "hhere" << std::endl;
-
   encoded = new std::string();
 
   std::string::iterator curr_symbol = input->begin();
-  std::cout << "HUI" << std::endl;
   while(curr_symbol != input->end()) {
     const char tmp[] = {*curr_symbol, '\0'};
-    std::cout << "JK: " << tmp << std::endl;
     encoded->append(map->at(std::string(tmp)));
-    std::cout << "JK 1" << std::endl;
     curr_symbol++;
   }
 
-  std::cout << "hhere 2" << std::endl;
-
   delete map;
-
-  std::cout << "hhere 3" << std::endl;
 
   this->encoded = encoded;
   this->encoding = new Huffman::Encoding();
@@ -331,8 +244,6 @@ std::string* Huffman::compress(std::string* input) {
     delete tmp;
     this->encoding->data->push_back(std::to_string(linkedlist->get(i)->tree->freq));
   }
-
-  std::cout << "gofferdeckel" << std::endl;
 
   delete linkedlist;
   delete bst;
