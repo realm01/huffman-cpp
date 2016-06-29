@@ -31,10 +31,10 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
-  string* input = new string();
   Huffman* hm = new Huffman();
 
   if(string(argv[1]) == string("-e")) {
+    string* input = new string();
     ifstream file;
     file.open(argv[2], ios::in);
 
@@ -47,11 +47,15 @@ int main(int argc, char *argv[]) {
 
     input->erase(input->end() - 1, input->end());
 
-    hm->compress(input);
-    hm->writeToFile(string(argv[3]));
+    hm->compress(input->c_str(), input->size());
+    hm->writeToFile(argv[3]);
+
+    if(input != NULL)
+      delete input;
   }else if(string(argv[1]) == string("-d")) {
     string header;
     unsigned int overflow;
+    std::vector<bool>* input = new std::vector<bool>();
 
     Huffman::prepareCompressed(header, input, overflow, argv[2]);
 
@@ -60,13 +64,14 @@ int main(int argc, char *argv[]) {
     hm->decompress(input);
 
     hm->writeToStringFile(argv[3]);
+    if(input != NULL)
+      delete input;
   }else{
     showHelp();
     return 1;
   }
 
   delete hm;
-  delete input;
 
   return 0;
 }

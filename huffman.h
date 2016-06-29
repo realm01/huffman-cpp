@@ -47,31 +47,32 @@ class BinaryTree {
     BinaryTree(LL* linkedlist, const unsigned int& size);
     ~BinaryTree(void);
     void print(Node const * next = NULL, unsigned int intent = 0, std::string curr_map = "");
-    void generateMapping(std::unordered_map<std::string, std::string>* map, Node* curr_node = NULL, std::string curr_map = "");
+    void generateMapping(std::unordered_map<char, std::vector<bool> >* map, Node* curr_node = NULL, std::vector<bool> curr_map = std::vector<bool>());
     Node* getFirst(void);
 };
 
 class Huffman {
   private:
-    std::string original;
-    std::string* encoded;
+    bool encode;
+    void* encoded;          // std::vector<bool>*   or    std::string*
     unsigned int overflow;
     struct Encoding {
-      std::vector<std::string>* data;
+      std::vector<char>* data;
+      std::vector<int>* freqs;
       ~Encoding(void);
     };
     Encoding* encoding;
-    std::string* generateHeader(void);
+    std::vector<char>* generateHeader(void);
   public:
     ~Huffman(void);
-    std::string* compress(std::string* input);
-    std::string* decompress(const std::string* input);
-    void setEncoding(std::vector<std::string>* encoding);
-    std::vector<std::string>* getEncoding(void);
-    std::vector<std::string>* parseEncoding(const std::string& str_enc);
-    std::string* getEncoded(void);
-    void writeToFile(const std::string& file, const bool write_header = true);
-    static void prepareCompressed(std::string& header, std::string* input, unsigned int& overflow, const char* file);
+    std::vector<bool>* compress(const char* input, const size_t& size);
+    std::string* decompress(const std::vector<bool>* input);
+    void setEncoding(Huffman::Encoding* encoding);
+    Huffman::Encoding* getEncoding(void);
+    Huffman::Encoding* parseEncoding(std::string& str_enc);
+    void* getEncoded(void);
+    void writeToFile(const char* file, const bool write_header = true);
+    static void prepareCompressed(std::string& header, std::vector<bool>* input, unsigned int& overflow, const char* file);
     void writeToStringFile(const char* file);
     void setOverflow(unsigned int& overflow);
 };
