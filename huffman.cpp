@@ -132,13 +132,15 @@ void BinaryTree::generateMapping(std::unordered_map<char, std::vector<bool> >* m
     return void();
 
   if(curr_node->left != NULL) {
-    curr_map.push_back(false);
-    generateMapping(map, curr_node->left, curr_map);
+    std::vector<bool> new_map = curr_map;
+    new_map.push_back(false);
+    generateMapping(map, curr_node->left, new_map);
   }
 
   if(curr_node->right != NULL) {
-    curr_map.push_back(true);
-    generateMapping(map, curr_node->right, curr_map);
+    std::vector<bool> new_map = curr_map;
+    new_map.push_back(true);
+    generateMapping(map, curr_node->right, new_map);
   }
 
   // left and right Nodes are NULL which means we are
@@ -219,13 +221,18 @@ std::vector<bool>* Huffman::compress(const char* input, const size_t& size) {
   }
 
   BinaryTree* bst = new BinaryTree(linkedlist, ll_size);
+
   std::unordered_map<char, std::vector<bool> >* map = new std::unordered_map<char, std::vector<bool> >();
   bst->generateMapping(map);
 
   encoded = (void*)(new std::vector<bool>());
 
   for(unsigned int i = 0; i < size; i++) {
-    ((std::vector<bool>*)encoded)->insert(((std::vector<bool>*)encoded)->end(), map->at(input[i]).begin(), map->at(input[i]).end());
+    std::vector<bool>::iterator iter = map->at(input[i]).begin();
+    while(iter != map->at(input[i]).end()) {
+      ((std::vector<bool>*)encoded)->push_back(*iter);
+      iter++;
+    }
   }
 
   delete map;
@@ -357,7 +364,7 @@ std::vector<char>* Huffman::generateHeader(void) {
 
   std::vector<char>* final = new std::vector<char>();
 
-  for(unsigned int i = 0; i < encoding->data->size(); i++)  {
+  for(int i = encoding->data->size() - 1; i >= 0; i--)  {
     final->push_back(encoding->data->at(i));
     std::string s = std::to_string(encoding->freqs->at(i));
     const char* tmp = s.c_str();
@@ -380,8 +387,6 @@ void Huffman::writeToFile(const char* file, const bool write_header) {
 
   // std::cout << "size: " << encoded->size() << std::endl;
   // std::cout << "allocating: " << alloc_bytes << " bytes" << std::endl;
-
-  // const char* c_string = encoded->c_str();
 
   unsigned int overflow = 0;
 
