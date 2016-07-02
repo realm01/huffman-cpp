@@ -443,6 +443,8 @@ void Huffman::writeToStringFile(const char* file) {
     i++;
   }
 
+  outfile << '\n';
+
   outfile.close();
 }
 
