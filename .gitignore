@@ -2,3 +2,5 @@
 *.sw*
 compiling_error.txt
 *.out
+cmake-build-debug/
+.idea/
